@@ -103,4 +103,97 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',
   wipe(()=>alvo.scrollIntoView());
 }));
 
-go(0,false);
+setTimeout(()=>go(0,false),1300);
+
+/* ===== v2: novidades ===== */
+const rnd=(a,b)=>Math.random()*(b-a)+a, sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const reveal=e=>{e.classList.add('rv');io.observe(e)};
+document.querySelectorAll('.explore>*,.checkin>*,.breath-copy,.vacinas>*').forEach(reveal);
+
+function confetti(x=innerWidth/2,y=innerHeight/2){
+  const cols=['#FFD84D','#B9F6CA','#4C9F38','#FF6F61','#8EE3EF','#ffffff'];
+  for(let i=0;i<60;i++){
+    const c=document.createElement('i'); c.className='cf'; c.style.cssText=`left:${x}px;top:${y}px;background:${cols[i%6]}`;
+    document.body.appendChild(c);
+    c.animate([{transform:'translate(0,0) rotate(0)',opacity:1},
+      {transform:`translate(${rnd(-300,300)}px,${rnd(-350,-50)}px) rotate(${rnd(0,720)}deg)`,opacity:1,offset:.4},
+      {transform:`translate(${rnd(-400,400)}px,${rnd(200,500)}px) rotate(${rnd(0,1080)}deg)`,opacity:0}],
+      {duration:rnd(1200,2200),easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>c.remove();
+  }
+}
+
+/* painéis expansíveis (dicas na mesma ordem de TEMAS) */
+const DICAS=[
+ ['Camisinha gratuita nas UBS','Teste rápido de HIV, sífilis e hepatites no SUS','Dúvida ou sintoma? Procure a UBS sem medo'],
+ ['Desconfie de print sem fonte','Confira em sites oficiais, como o Ministério da Saúde e a OMS','Na dúvida, não compartilhe'],
+ ['Planejamento reprodutivo gratuito no SUS','Converse com a UBS sobre métodos contraceptivos','Pré-natal gratuito e rede de apoio'],
+ ['CVV: 188, 24 horas, ligação gratuita','UBS e CAPS atendem pelo SUS','Fale com alguém de confiança'],
+ ['Pausas curtas ajudam a estudar','Dormir bem ajuda a fixar o conteúdo','Peça apoio à escola ou à coordenação'],
+ ['Leve a caderneta à UBS','O Meu SUS Digital mostra suas vacinas','As vacinas do calendário são gratuitas']
+];
+const panels=$('#panels');
+const openPanel=i=>[...panels.children].forEach((e,j)=>e.classList.toggle('on',j===i));
+TEMAS.forEach((t,i)=>{
+  const p=document.createElement('div'); p.className='panel'+(i?'':' on'); p.tabIndex=0;
+  p.style.backgroundImage=t.img?`url(${t.img}), ${t.grad}`:t.grad;
+  p.innerHTML=`<h3>${t.nome}</h3><div class="pc"><small style="color:${t.cor}">${t.tag}</small><h4>${t.titulo}</h4><ul>${DICAS[i].map(d=>`<li>${d}</li>`).join('')}</ul></div>`;
+  p.onmouseenter=p.onclick=p.onfocus=()=>openPanel(i);
+  panels.appendChild(p);
+});
+
+/* mito ou verdade: placar + confete */
+const found=new Set(), seen=e=>{const c=e.target.closest('.card'); if(!c||found.has(c))return; found.add(c);
+  $('#score b').textContent=found.size;
+  if(found.size===CARTAS.length){confetti();$('#score').textContent='Você descobriu tudo! Agora compartilhe a informação certa.'}};
+cards.addEventListener('click',seen); cards.addEventListener('keydown',e=>e.key==='Enter'&&seen(e));
+
+/* check-in de humor */
+const MOODS=[
+ {e:'😄',bg:'#14703a',m:'Que bom! Guarde essa energia e conte para alguém o que fez seu dia ser bom.'},
+ {e:'🙂',bg:'#0D4A33',m:'Dia tranquilo também conta. Um copo d’água e uma pausa já ajudam.'},
+ {e:'😴',bg:'#1b3a52',m:'Corpo cansado pede descanso. Dormir bem também é estudar.',l:['#respire','Fazer uma pausa guiada']},
+ {e:'😰',bg:'#4a2f4f',m:'A ansiedade aperta, mas passa. Vamos respirar juntos por um minuto?',l:['#respire','Respirar agora']},
+ {e:'😔',bg:'#173a55',m:'Obrigado por reconhecer isso. Falar com alguém de confiança ajuda. Se estiver pesado demais, o CVV atende 24h pelo 188.',l:['#explore','Ver onde buscar apoio'],p:3}
+];
+const moods=$('#moods'), rep=$('#reply');
+MOODS.forEach(m=>{
+  const b=document.createElement('button'); b.textContent=m.e; b.setAttribute('aria-label','Humor '+m.e);
+  b.onclick=()=>{
+    [...moods.children].forEach(x=>x.classList.toggle('on',x===b));
+    $('#checkin').style.setProperty('--mood',m.bg);
+    rep.innerHTML=`<p>${m.m}</p>`+(m.l?`<a class="btn" href="${m.l[0]}">${m.l[1]}</a>`:'');
+    if(m.p!==undefined)openPanel(m.p);
+    if(m.e==='😄'){const r=b.getBoundingClientRect();confetti(r.x+46,r.y+46)}
+  };
+  moods.appendChild(b);
+});
+
+/* respiração guiada: 4 ciclos de inspire 4s, segure 4s, solte 6s */
+const orb=$('#orb'), ot=$('#orb-t'), bb=$('#breath-btn'); let run=0;
+bb.onclick=async()=>{
+  if(bb.dataset.on){run++;delete bb.dataset.on;bb.textContent='Começar';ot.textContent='Pronto?';orb.style.transform='scale(.6)';return}
+  const id=++run; bb.dataset.on=1; bb.textContent='Parar';
+  const ph=async(t,sc,s)=>{if(id!==run)return; ot.textContent=t; orb.style.transition=`transform ${s}s ease-in-out`; orb.style.transform=`scale(${sc})`; await sleep(s*1000)};
+  for(let c=1;c<=4&&id===run;c++){await ph('Inspire',1,4);await ph('Segure',1,4);await ph('Solte',.6,6);if(id===run)$('#cycles').textContent=`${c} de 4 ciclos`}
+  if(id===run){delete bb.dataset.on;bb.textContent='Começar de novo';ot.textContent='Muito bem!';confetti()}
+};
+
+/* caderneta de vacinas (lembrete, não substitui o cartão) */
+const VAX=['Hepatite B','Tríplice viral','HPV','Meningocócica ACWY','dT (difteria e tétano)','Febre amarela'], ok=new Set(), arc=$('#arc');
+VAX.forEach((v,i)=>{
+  const b=document.createElement('button'); b.textContent=v; b.setAttribute('aria-pressed','false');
+  b.onclick=e=>{
+    ok.has(i)?ok.delete(i):ok.add(i); b.classList.toggle('on'); b.setAttribute('aria-pressed',ok.has(i));
+    arc.style.strokeDashoffset=327*(1-ok.size/VAX.length); $('#ring-n').textContent=`${ok.size}/${VAX.length}`;
+    const full=ok.size===VAX.length; $('#vax-msg').textContent=full?'Caderneta completa! Pergunte na UBS se falta alguma dose de reforço.':'';
+    if(full)confetti(e.clientX,e.clientY);
+  };
+  $('#vax').appendChild(b);
+});
+
+/* botões magnéticos + barra de progresso da página */
+document.querySelectorAll('.btn,.pill').forEach(b=>{
+  b.addEventListener('mousemove',e=>{const r=b.getBoundingClientRect();b.style.translate=`${(e.clientX-r.left-r.width/2)*.25}px ${(e.clientY-r.top-r.height/2)*.35}px`});
+  b.addEventListener('mouseleave',()=>b.style.translate='');
+});
+addEventListener('scroll',()=>$('.sp').style.width=scrollY/(document.body.scrollHeight-innerHeight)*100+'%',{passive:true});

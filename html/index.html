@@ -1,85 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nextage · Saúde e bem-estar para a juventude</title>
-  <meta name="description"
-    content="Nextage: informação sem tabu sobre IST, maternidade precoce, saúde mental, pressão acadêmica e vacinação. ODS 3.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nextage · Saúde e bem-estar para a juventude</title>
+<meta name="description" content="Nextage: informação sem tabu sobre IST, maternidade precoce, saúde mental, pressão acadêmica e vacinação. ODS 3.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
 </head>
-
 <body>
-  <div class="glow" aria-hidden="true"></div>
-  <div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<div class="loader" aria-hidden="true"><span>Next<b>age</b></span><i></i></div>
+<div class="sp" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"></div>
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 
-  <header class="top">
-    <a class="logo" href="#temas">Next<b>age</b></a>
-    <nav><a href="#temas">Temas</a><a href="#mitos">Mito ou verdade</a><a href="#ods">ODS 3</a><a href="#contato"
-        class="pill">Participe</a></nav>
-  </header>
+<header class="top">
+  <a class="logo" href="#temas">Next<b>age</b></a>
+  <nav><a href="#temas">Temas</a><a href="#mitos">Mito ou verdade</a><a href="#checkin">Check-in</a><a href="#respire">Respire</a><a href="#vacinas">Vacinas</a><a href="#ods">ODS 3</a><a href="#contato" class="pill">Participe</a></nav>
+</header>
 
-  <section class="hero" id="temas">
-    <div class="bg b1"></div>
-    <div class="bg b2"></div>
-    <div class="shade"></div>
-    <span class="blob x1"></span><span class="blob x2"></span>
-    <div class="hero-copy">
-      <p class="tag" id="h-tag"></p>
-      <h1 id="h-title"></h1>
-      <p class="lead" id="h-text"></p>
-      <a class="btn" id="h-cta" href="#mitos">Teste o que você sabe</a>
-    </div>
-    <ul class="menu" id="menu"></ul>
-    <div class="bar"><i id="bar"></i></div>
-    <button class="arrow prev" aria-label="Anterior">‹</button>
-    <button class="arrow next" aria-label="Próximo">›</button>
-  </section>
+<section class="hero" id="temas">
+  <div class="bg b1"></div><div class="bg b2"></div><div class="shade"></div>
+  <span class="blob x1"></span><span class="blob x2"></span>
+  <div class="hero-copy">
+    <p class="tag" id="h-tag"></p>
+    <h1 id="h-title"></h1>
+    <p class="lead" id="h-text"></p>
+    <a class="btn" id="h-cta" href="#mitos">Teste o que você sabe</a>
+  </div>
+  <ul class="menu" id="menu"></ul>
+  <div class="bar"><i id="bar"></i></div>
+  <button class="arrow prev" aria-label="Anterior">‹</button>
+  <button class="arrow next" aria-label="Próximo">›</button>
+</section>
 
-  <div class="marquee" aria-hidden="true">
-    <div>
-      <span>Falar abre caminhos</span><span>Informação protege</span><span>Cuidar de si é coragem</span><span>Vacina é
-        cuidado coletivo</span>
-      <span>Falar abre caminhos</span><span>Informação protege</span><span>Cuidar de si é coragem</span><span>Vacina é
-        cuidado coletivo</span>
+<div class="marquee" aria-hidden="true"><div>
+  <span>Falar abre caminhos</span><span>Informação protege</span><span>Cuidar de si é coragem</span><span>Vacina é cuidado coletivo</span>
+  <span>Falar abre caminhos</span><span>Informação protege</span><span>Cuidar de si é coragem</span><span>Vacina é cuidado coletivo</span>
+</div></div>
+
+<section class="explore" id="explore">
+  <h2>Escolha seu caminho</h2>
+  <p class="sub">Passe o mouse ou toque em um painel para abrir.</p>
+  <div class="panels" id="panels"></div>
+</section>
+
+<section class="mitos" id="mitos">
+  <h2>Mito ou verdade?</h2>
+  <p class="sub">Toque na carta e descubra. Informação certa é a primeira camada de proteção.</p>
+  <p class="score" id="score">Descobertas: <b>0</b>/6</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section class="checkin" id="checkin">
+  <h2>Como você está hoje?</h2>
+  <p class="sub">Escolha uma carinha. Aqui ninguém julga.</p>
+  <div class="moods" id="moods"></div>
+  <div class="reply" id="reply" aria-live="polite"></div>
+</section>
+
+<section class="breath" id="respire">
+  <div class="orb" id="orb" style="transform:scale(.6)"><span id="orb-t">Pronto?</span></div>
+  <div class="breath-copy">
+    <h2>Respire por 1 minuto</h2>
+    <p>Prova chegando? Cabeça a mil? Siga o círculo: inspire, segure e solte devagar.</p>
+    <button class="btn" id="breath-btn">Começar</button>
+    <p class="mini" id="cycles"></p>
+  </div>
+</section>
+
+<section class="vacinas" id="vacinas">
+  <div class="ring-wrap">
+    <svg viewBox="0 0 120 120" class="ring" aria-hidden="true"><circle cx="60" cy="60" r="52"/><circle id="arc" cx="60" cy="60" r="52"/></svg>
+    <b id="ring-n">0/6</b>
+  </div>
+  <div>
+    <h2>Monte sua caderneta</h2>
+    <p>Marque o que você já tomou e veja o anel fechar. É só um lembrete: confirme no cartão ou no Meu SUS Digital e, na dúvida, vá à UBS.</p>
+    <div class="vax" id="vax"></div>
+    <p class="mini" id="vax-msg"></p>
+  </div>
+</section>
+
+<section class="ods" id="ods">
+  <div class="bg b3"></div>
+  <div class="ods-in">
+    <h2>Nossa bússola é a ODS 3</h2>
+    <p>Assegurar uma vida saudável e promover o bem-estar para todas as pessoas, em todas as idades. Faz parte da Agenda 2030 da ONU.</p>
+    <div class="nums">
+      <div><b data-n="3">0</b><span>é o número da ODS Saúde e Bem-Estar</span></div>
+      <div><b data-n="13">0</b><span>metas dentro da ODS 3</span></div>
+      <div><b data-n="6">0</b><span>temas que a Nextage trabalha</span></div>
+      <div><b data-n="2030">0</b><span>o prazo da Agenda</span></div>
     </div>
   </div>
+</section>
 
-  <section class="mitos" id="mitos">
-    <h2>Mito ou verdade?</h2>
-    <p class="sub">Toque na carta e descubra. Informação certa é a primeira camada de proteção.</p>
-    <div class="cards" id="cards"></div>
-  </section>
+<section class="contato" id="contato">
+  <h2>Faça parte da Nextage</h2>
+  <p>Escolas, coletivos e jovens voluntários: venha construir essa rede com a gente.</p>
+  <a class="btn" href="mailto:contato@nextage.org">Quero participar</a>
+</section>
 
-  <section class="ods" id="ods">
-    <div class="bg b3"></div>
-    <div class="ods-in">
-      <h2>Nossa bússola é a ODS 3</h2>
-      <p>Assegurar uma vida saudável e promover o bem-estar para todas as pessoas, em todas as idades. Faz parte da
-        Agenda 2030 da ONU.</p>
-      <div class="nums">
-        <div><b data-n="3">0</b><span>é o número da ODS Saúde e Bem-Estar</span></div>
-        <div><b data-n="13">0</b><span>metas dentro da ODS 3</span></div>
-        <div><b data-n="6">0</b><span>temas que a Nextage trabalha</span></div>
-        <div><b data-n="2030">0</b><span>o prazo da Agenda</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="contato" id="contato">
-    <h2>Faça parte da Nextage</h2>
-    <p>Escolas, coletivos e jovens voluntários: venha construir essa rede com a gente.</p>
-    <a class="btn" href="mailto:contato@nextage.org">Quero participar</a>
-  </section>
-
-  <footer><span>© 2026 Nextage</span><span>Este site informa e não substitui atendimento médico. Procure uma UBS ou o
-      CVV (188) quando precisar.</span></footer>
-  <script src="../js/main.js"></script>
+<footer><span>© 2026 Nextage</span><span>Este site informa e não substitui atendimento médico. Procure uma UBS ou o CVV (188) quando precisar.</span></footer>
+<script src="../js/main.js"></script>
 </body>
-
 </html>
