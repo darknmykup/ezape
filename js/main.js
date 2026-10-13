@@ -54,12 +54,16 @@ function go(i,withWipe=true){
   withWipe?wipe(()=>{paintBg(t);fill(t)}):(paintBg(t),fill(t));
   progress();
 }
+let pt=0,raf=0,heroOn=true;
 function progress(){
-  clearInterval(timer); const bar=$('#bar'), s=performance.now();
-  timer=setInterval(()=>{
-    const p=(performance.now()-s)/DUR; bar.style.width=Math.min(p*100,100)+'%';
-    if(p>=1) go(cur+1,false);
-  },50);
+  cancelAnimationFrame(raf); pt=0; const bar=$('#bar'); let last=performance.now();
+  const tick=now=>{
+    pt+=heroOn?Math.max(0,Math.min(now-last,100)):0; last=now;
+    if(heroOn)bar.style.transform=`scaleX(${Math.min(pt/DUR,1)})`;
+    if(pt>=DUR)return go(cur+1,false);
+    raf=requestAnimationFrame(tick);
+  };
+  raf=requestAnimationFrame(tick);
 }
 
 TEMAS.forEach((t,i)=>{
@@ -91,12 +95,6 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{
 }),{threshold:.25});
 document.querySelectorAll('.rv').forEach(e=>io.observe(e));
 
-const glow=$('.glow');
-addEventListener('mousemove',e=>{
-  glow.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;
-  const x=(e.clientX/innerWidth-.5)*30, y=(e.clientY/innerHeight-.5)*30;
-  $('.x1').style.translate=`${-x*2}px ${-y*2}px`; $('.x2').style.translate=`${x*3}px ${y*3}px`;
-});
 
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
   const alvo=$(a.getAttribute('href')); if(!alvo)return; e.preventDefault();
@@ -135,9 +133,9 @@ const panels=$('#panels');
 const openPanel=i=>[...panels.children].forEach((e,j)=>e.classList.toggle('on',j===i));
 TEMAS.forEach((t,i)=>{
   const p=document.createElement('div'); p.className='panel'+(i?'':' on'); p.tabIndex=0;
-  p.style.backgroundImage=t.img?`url(${t.img}), ${t.grad}`:t.grad;
-  p.innerHTML=`<h3>${t.nome}</h3><div class="pc"><small style="color:${t.cor}">${t.tag}</small><h4>${t.titulo}</h4><ul>${DICAS[i].map(d=>`<li>${d}</li>`).join('')}</ul></div>`;
-  p.onmouseenter=p.onclick=p.onfocus=()=>openPanel(i);
+  const bgi=t.img?`url(${t.img}), ${t.grad}`:t.grad;
+  p.innerHTML=`<div class="pbg" style="background-image:linear-gradient(0deg,rgba(7,40,30,.92),transparent 70%),${bgi}"></div><h3>${t.nome}</h3><div class="pc"><small style="color:${t.cor}">${t.tag}</small><h4>${t.titulo}</h4><ul>${DICAS[i].map(d=>`<li>${d}</li>`).join('')}</ul></div>`;
+  let ht; p.onclick=p.onfocus=()=>openPanel(i); p.onmouseenter=()=>{clearTimeout(ht);ht=setTimeout(()=>openPanel(i),90)}; p.onmouseleave=()=>clearTimeout(ht);
   panels.appendChild(p);
 });
 
@@ -196,4 +194,37 @@ document.querySelectorAll('.btn,.pill').forEach(b=>{
   b.addEventListener('mousemove',e=>{const r=b.getBoundingClientRect();b.style.translate=`${(e.clientX-r.left-r.width/2)*.25}px ${(e.clientY-r.top-r.height/2)*.35}px`});
   b.addEventListener('mouseleave',()=>b.style.translate='');
 });
-addEventListener('scroll',()=>$('.sp').style.width=scrollY/(document.body.scrollHeight-innerHeight)*100+'%',{passive:true});
+
+/* ===== v3: desempenho ===== */
+const hero0=$('.hero'), fine=matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* pausa animações infinitas quando a seção sai da tela */
+const vis=new IntersectionObserver(es=>es.forEach(e=>{
+  e.target.classList.toggle('off',!e.isIntersecting);
+  if(e.target===hero0)heroOn=e.isIntersecting;
+}),{rootMargin:'100px'});
+document.querySelectorAll('.hero,.marquee,.ods').forEach(e=>vis.observe(e));
+
+/* pré-carrega e decodifica as fotos para a troca de fundo não travar */
+TEMAS.forEach(t=>{if(t.img){const i=new Image();i.src=t.img;i.decode&&i.decode().catch(()=>{})}});
+
+/* barra de rolagem: 1 atualização por frame, só com transform */
+const sp=$('.sp'); let maxS=1, tk=false;
+const measure=()=>{maxS=Math.max(1,document.documentElement.scrollHeight-innerHeight)};
+new ResizeObserver(measure).observe(document.body); measure();
+addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{sp.style.transform=`scaleX(${Math.min(scrollY/maxS,1)})`;tk=false})},{passive:true});
+
+/* brilho e blobs seguem o mouse com suavização independente da taxa de quadros */
+if(fine){
+  const glow=$('.glow'), b1=$('.x1'), b2=$('.x2');
+  let mx=innerWidth/2, my=innerHeight/2, gx=mx, gy=my, lt=0, going=false;
+  const loop=now=>{
+    const a=1-Math.exp(-Math.max(0,Math.min(now-lt,50))/80); lt=now;
+    gx+=(mx-gx)*a; gy+=(my-gy)*a;
+    glow.style.transform=`translate3d(${gx}px,${gy}px,0)`;
+    if(heroOn){const x=(gx/innerWidth-.5)*30, y=(gy/innerHeight-.5)*30;
+      b1.style.translate=`${-x*2}px ${-y*2}px`; b2.style.translate=`${x*3}px ${y*3}px`}
+    if(Math.abs(mx-gx)+Math.abs(my-gy)>.4)requestAnimationFrame(loop); else going=false;
+  };
+  addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;if(!going){going=true;lt=performance.now();requestAnimationFrame(loop)}},{passive:true});
+}
